@@ -2,15 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import { toast } from "react-toastify";
-const OFFICE_LOCATION = {
-  latitude: 11.6735742,
-  longitude: 78.1330915,
-  allowedRadius: 20
-};
+// const OFFICE_LOCATION = {
+//   latitude: 11.6735742,
+//   longitude: 78.1330915,
+//   allowedRadius: 20
+// };
 const Dashboard = () => {
   const navigate = useNavigate();
   const [checkInTime, setCheckInTime] = useState(null);
   const [checkOutTime, setCheckOutTime] = useState(null);
+  const [checkInLocation, setCheckInLocation] = useState("");
+  const [checkOutLocation, setCheckOutLocation] = useState("");
+  const [todayAttendance, setTodayAttendance] = useState(null);
   const [workingHours, setWorkingHours] = useState(0);
   const [remainingHours, setRemainingHours] = useState(9);
   const [isWorking, setIsWorking] = useState(false);
@@ -23,8 +26,18 @@ const Dashboard = () => {
   });
   const [locationError, setLocationError] = useState("");
   const [isCheckingIn, setIsCheckingIn] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Add state for selected date
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  ); // Add state for selected date
   const TOTAL_WORK_HOURS = 9;
+  const reverseGeocode = async (lat, lon) => {
+    const apiKey = "pk.a02fb33a5b85e9dbe4c4a15dab83f4ea";
+    const response = await fetch(
+      `https://us1.locationiq.com/v1/reverse.php?key=${apiKey}&lat=${lat}&lon=${lon}&format=json&accept-language=en`
+    );
+    const data = await response.json();
+    return data.display_name || "Address not found";
+  };
   useEffect(() => {
     const authData = localStorage.getItem("authData");
     if (authData) {
@@ -56,6 +69,7 @@ const Dashboard = () => {
           date: today,
           user_id: userid
         }).toString();
+
         const response = await fetch(
           `https://dontsign.mpeoplesnet.com/api/attendance-report-for-user-day?${queryParams}`,
           {
@@ -66,30 +80,57 @@ const Dashboard = () => {
             }
           }
         );
+
         const result = await response.json();
         console.log(result);
-        
-        const attendances = result?.data?.userinfo?.[0]?.attendances || []; 
-        const todayAttendance = attendances.find(
+
+        const attendances = result?.data?.userinfo?.[0]?.attendances || [];
+        const todayAtt = attendances.find(
           (entry) => entry.attendance_date === today
-        ); 
-        if (todayAttendance) {
-          const { check_in, check_out } = todayAttendance;  
+        );
+
+        setTodayAttendance(todayAtt);
+
+        if (todayAtt) {
+          const { check_in, check_out, lat, lon, checkout_lat, checkout_lon } =
+            todayAtt;
+
           // Convert time strings to Date objects for formatting
-          const checkInDate = check_in ? new Date(`${today}T${check_in}`) : null;
-          const checkOutDate = check_out ? new Date(`${today}T${check_out}`) : null;  
+          const checkInDate = check_in
+            ? new Date(`${today}T${check_in}`)
+            : null;
+          const checkOutDate = check_out
+            ? new Date(`${today}T${check_out}`)
+            : null;
+
           setCheckInTime(checkInDate);
           setCheckOutTime(checkOutDate);
+
+          // Get location addresses
+          if (lat && lon) {
+            const inLocation = await reverseGeocode(lat, lon);
+            setCheckInLocation(inLocation);
+          }
+
+          if (checkout_lat && checkout_lon) {
+            const outLocation = await reverseGeocode(
+              checkout_lat,
+              checkout_lon
+            );
+            setCheckOutLocation(outLocation);
+          }
         } else {
           setCheckInTime(null);
           setCheckOutTime(null);
+          setCheckInLocation("");
+          setCheckOutLocation("");
         }
       } catch (error) {
         console.error("Error during fetch:", error);
       }
     };
     sendData();
-  }, []); 
+  }, []);
   useEffect(() => {
     return () => {
       if (timer) clearInterval(timer);
@@ -100,12 +141,12 @@ const Dashboard = () => {
       const authData = localStorage.getItem("authData");
       const parsedData = JSON.parse(authData);
       const userid = parsedData.data.user_id;
-      
+
       const queryParams = new URLSearchParams({
         date: date,
         user_id: userid
       }).toString();
-      
+
       const response = await fetch(
         `https://dontsign.mpeoplesnet.com/api/attendance-report-for-user-day?${queryParams}`,
         {
@@ -116,21 +157,23 @@ const Dashboard = () => {
           }
         }
       );
-      
+
       const result = await response.json();
-      const attendances = result?.data?.userinfo?.[0]?.attendances || []; 
+      const attendances = result?.data?.userinfo?.[0]?.attendances || [];
       const selectedDateAttendance = attendances.find(
         (entry) => entry.attendance_date === date
-      ); 
-      
+      );
+
       if (selectedDateAttendance) {
-        const { check_in, check_out } = selectedDateAttendance;  
+        const { check_in, check_out } = selectedDateAttendance;
         // Convert time strings to Date objects for formatting
         const checkInDate = check_in ? new Date(`${date}T${check_in}`) : null;
-        const checkOutDate = check_out ? new Date(`${date}T${check_out}`) : null;  
+        const checkOutDate = check_out
+          ? new Date(`${date}T${check_out}`)
+          : null;
         setCheckInTime(checkInDate);
         setCheckOutTime(checkOutDate);
-        
+
         // Calculate working hours if both check-in and check-out exist
         if (checkInDate && checkOutDate) {
           const hoursWorked = (checkOutDate - checkInDate) / (1000 * 60 * 60);
@@ -164,53 +207,53 @@ const Dashboard = () => {
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
   };
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371e3; // Earth radius in meters
-    const loc1 = (lat1 * Math.PI) / 180;
-    const loc2 = (lat2 * Math.PI) / 180;
-    const loc3 = ((lat2 - lat1) * Math.PI) / 180;
-    const loc4 = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(loc3 / 2) * Math.sin(loc3 / 2) +
-      Math.cos(loc1) * Math.cos(loc2) * Math.sin(loc4 / 2) * Math.sin(loc4 / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
-  const verifyLocation = () => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error("Geolocation is not supported by your browser"));
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const distance = calculateDistance(
-            position.coords.latitude,
-            position.coords.longitude,
-            OFFICE_LOCATION.latitude,
-            OFFICE_LOCATION.longitude
-          );
-          if (distance <= OFFICE_LOCATION.allowedRadius) {
-            resolve(position);
-          } else {
-            reject(
-              new Error(
-                `You must be within ${
-                  OFFICE_LOCATION.allowedRadius
-                }m of the office to check in. Current distance: ${Math.round(
-                  distance
-                )}m`
-              )
-            );
-          }
-        },
-        (error) => {
-          reject(new Error("Unable to retrieve your location"));
-        },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-      );
-    });
-  };
+  // const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  //   const R = 6371e3; // Earth radius in meters
+  //   const loc1 = (lat1 * Math.PI) / 180;
+  //   const loc2 = (lat2 * Math.PI) / 180;
+  //   const loc3 = ((lat2 - lat1) * Math.PI) / 180;
+  //   const loc4 = ((lon2 - lon1) * Math.PI) / 180;
+  //   const a =
+  //     Math.sin(loc3 / 2) * Math.sin(loc3 / 2) +
+  //     Math.cos(loc1) * Math.cos(loc2) * Math.sin(loc4 / 2) * Math.sin(loc4 / 2);
+  //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  //   return R * c;
+  // };
+  // const verifyLocation = () => {
+  //   return new Promise((resolve, reject) => {
+  //     if (!navigator.geolocation) {
+  //       reject(new Error("Geolocation is not supported by your browser"));
+  //       return;
+  //     }
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => {
+  //         const distance = calculateDistance(
+  //           position.coords.latitude,
+  //           position.coords.longitude,
+  //           OFFICE_LOCATION.latitude,
+  //           OFFICE_LOCATION.longitude
+  //         );
+  //         if (distance <= OFFICE_LOCATION.allowedRadius) {
+  //           resolve(position);
+  //         } else {
+  //           reject(
+  //             new Error(
+  //               `You must be within ${
+  //                 OFFICE_LOCATION.allowedRadius
+  //               }m of the office to check in. Current distance: ${Math.round(
+  //                 distance
+  //               )}m`
+  //             )
+  //           );
+  //         }
+  //       },
+  //       (error) => {
+  //         reject(new Error("Unable to retrieve your location"));
+  //       },
+  //       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+  //     );
+  //   });
+  // };
   const handleCheckIn = async () => {
     setIsCheckingIn(true);
     setLocationError("");
@@ -253,8 +296,7 @@ const Dashboard = () => {
       console.log(data);
 
       console.log(data);
-      toast.success("Checked-in Successfully")
-      
+      toast.success("Checked-in Successfully");
     } catch (error) {
       setLocationError(error.message);
     } finally {
@@ -319,7 +361,7 @@ const Dashboard = () => {
       );
       const data = await response.json();
       console.log(data);
-      toast.success("Checked-out Successfully")
+      toast.success("Checked-out Successfully");
     } catch (error) {
       setLocationError(error.message);
     }
@@ -370,20 +412,43 @@ const Dashboard = () => {
           id="attendance-date"
           value={selectedDate}
           onChange={handleDateChange}
-          max={new Date().toISOString().split('T')[0]} // Don't allow future dates
+          max={new Date().toISOString().split("T")[0]} // Don't allow future dates
         />
       </div>
       <div className="attendance-card">
-        <h2>Attendance Tracking for {new Date(selectedDate).toLocaleDateString()}</h2>
+        <h2>
+          Attendance Tracking for {new Date(selectedDate).toLocaleDateString()}
+        </h2>
         {locationError && <div className="error-message">{locationError}</div>}
         <div className="time-display">
-          <div>
+          <div className="time-display1">
             <span className="time-label">Check-In:</span>
             <span className="time-value">{formatTime(checkInTime)}</span>
+            <div className="location-info">
+              {checkInLocation && (
+                <div className="time-display2">
+                  <p>Location: {checkInLocation}</p>
+                  {/* <p>
+                    Coordinates: {todayAttendance?.lat}, {todayAttendance?.lon}
+                  </p> */}
+                </div>
+              )}
+            </div>
           </div>
-          <div>
+          <div className="time-display1">
             <span className="time-label">Check-Out:</span>
             <span className="time-value">{formatTime(checkOutTime)}</span>
+            <div className="location-info">
+              {checkOutLocation && (
+                <div className="time-display2">
+                  <p>Location: {checkOutLocation}</p>
+                  {/* <p>
+                    Coordinates: {todayAttendance?.checkout_lat},{" "}
+                    {todayAttendance?.checkout_lon}
+                  </p> */}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <div className="hours-display">
@@ -420,13 +485,13 @@ const Dashboard = () => {
             </button>
           )}
         </div>
-        <div className="location-info">
+        {/* <div className="location-info">
           <p>
             Office Location: Latitude {OFFICE_LOCATION.latitude}, Longitude{" "}
             {OFFICE_LOCATION.longitude}
           </p>
           <p>Allowed check-in radius: {OFFICE_LOCATION.allowedRadius}m</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
