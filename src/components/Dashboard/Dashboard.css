@@ -97,8 +97,8 @@
 
 .sidebar-header {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  /* flex-direction: column; */
+  justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 30px;
   padding-bottom: 20px;
@@ -668,8 +668,8 @@
     align-items: center;
   }
   .sidebar {
-    width: 220px;
-    left: -300px;
+    width: 100%;
+    left: -100%;
   }
   .main-content {
     width: 100%;

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import { toast } from "react-toastify";
 import { saveAs } from "file-saver";
-import * as XLSX from "xlsx"; // Install with: npm install xlsx file-saver
+// import * as XLSX from "xlsx";
 // const OFFICE_LOCATION = {
 //   latitude: 11.6735742,
 //   longitude: 78.1330915,
@@ -628,12 +628,21 @@ const Dashboard = () => {
           />
         </div>
         <div>
-          <button
-            className="sidebar-toggle"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            ☰
-          </button>
+          {!sidebarOpen ? (
+            <button
+              className="sidebar-toggle"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              ☰
+            </button>
+          ) : (
+            <button
+              className="sidebar-toggle"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
@@ -642,18 +651,28 @@ const Dashboard = () => {
         <div className="sidebar-content">
           <div className="duplicate">
             <div className="sidebar-header">
-              <img
-                src={employeeData.profileimg}
-                alt="Profile"
-                className="employee-image"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "";
-                }}
-              />
-              <div className="sidebar-user-info">
-                <h3>{employeeData.name}</h3>
-                <p>{employeeData.role}</p>
+              <div>
+                <img
+                  src={employeeData.profileimg}
+                  alt="Profile"
+                  className="employee-image"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "";
+                  }}
+                />
+                <div className="sidebar-user-info">
+                  <h3>{employeeData.name}</h3>
+                  <p>{employeeData.role}</p>
+                </div>
+              </div>
+              <div>
+                <button
+                  className="sidebar-toggle"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                >
+                  ✕
+                </button>
               </div>
             </div>
             <ul className="sidebar-menu">
