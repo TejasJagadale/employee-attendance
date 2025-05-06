@@ -1,27 +1,101 @@
-/* Login.css */
-
 /* Base Styles */
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: transparent;
   padding: 20px;
+  background-image: url("/public/bg2.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+  margin: 0;
 }
 
+.glow-spinner {
+  width: 64px;
+  height: 64px;
+  border: 8px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #0dcaf0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite, glow 1.5s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px #0dcaf0;
+  }
+  50% {
+    box-shadow: 0 0 20px #0dcaf0;
+  }
+}
+
+
+.login-bg {
+  background: linear-gradient(to right, #004e92, #000428);
+  backdrop-filter: blur(3px);
+}
+
+.glass-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+}
+
+.logo-img {
+  width: 50px;
+  height: 50px;
+}
+
+.custom-input {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: black !important; /* Change this from white to black */
+}
+
+.custom-input::placeholder {
+  color: rgba(0, 0, 0, 0.5); /* Optional: darken placeholder too */
+}
+
+
+
 .login-box {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 30px;
   width: 100%;
   max-width: 400px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
 }
+
+/* Hover Effects */
+.login-box:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+  transform: scale(1.02);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+
 
 .login-box h2 {
   text-align: center;
-  color: #2c3e50;
+  color: white;
   margin-bottom: 25px;
   font-size: 24px;
 }
@@ -43,7 +117,7 @@
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #34495e;
+  color: white;
   font-weight: 500;
   font-size: 14px;
 }
