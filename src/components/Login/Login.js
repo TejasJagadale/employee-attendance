@@ -95,7 +95,7 @@ const Login = () => {
   return (
     <div
       className="login-page d-flex align-items-center justify-content-center vh-100 text-light"
-      style={{ position: "relative", background:'linear-gradient(135deg, #4895ef,rgb(37, 29, 178)' }}
+      style={{ position: "relative", background:'linear-gradient(135deg, #4895ef,rgb(7, 0, 138)' }}
     >
       <div className="container shadow-lg rounded-4 overflow-hidden bg-light login-wrapper">
         <div className="row g-0 bg-light rounded">
@@ -161,7 +161,7 @@ const Login = () => {
                 type="submit"
                 className="btn  w-100 btn-lg fw-bold"
                 disabled={isLoading}
-                style={{background:'linear-gradient(135deg, #4895ef,rgb(37, 29, 178)', color:'white'}}
+                style={{background:'linear-gradient(135deg, #4895ef,rgb(7, 0, 138)', color:'white'}}
               >
                 {isLoading ? "Logging in..." : "Login"}
               </button>

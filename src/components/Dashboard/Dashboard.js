@@ -640,28 +640,30 @@ const Dashboard = () => {
       {/* Sidebar */}
       <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-content">
-          <div className="sidebar-header">
-            <img
-              src={employeeData.profileimg}
-              alt="Profile"
-              className="employee-image"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "";
-              }}
-            />
-            <div className="sidebar-user-info">
-              <h3>{employeeData.name}</h3>
-              <p>{employeeData.role}</p>
+          <div className="duplicate">
+            <div className="sidebar-header">
+              <img
+                src={employeeData.profileimg}
+                alt="Profile"
+                className="employee-image"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "";
+                }}
+              />
+              <div className="sidebar-user-info">
+                <h3>{employeeData.name}</h3>
+                <p>{employeeData.role}</p>
+              </div>
             </div>
+            <ul className="sidebar-menu">
+              <li className="active">Dashboard</li>
+              <li>Attendance</li>
+              <li>Reports</li>
+              <li>Profile</li>
+              <li>Settings</li>
+            </ul>
           </div>
-          <ul className="sidebar-menu">
-            <li className="active">Dashboard</li>
-            <li>Attendance</li>
-            <li>Reports</li>
-            <li>Profile</li>
-            <li>Settings</li>
-          </ul>
           <div className="navbar-right">
             <button onClick={handleLogout} className="logout-button">
               Logout
