@@ -75,12 +75,14 @@
   position: fixed;
   left: -250px;
   top: 0;
-  background: #2c3e50;
-  color: white;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  color: black;
   transition: all 0.3s ease;
   z-index: 2000;
   /* padding-top: 70px; */
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 .sidebar.open {

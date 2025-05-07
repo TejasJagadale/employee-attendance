@@ -94,27 +94,26 @@ const Login = () => {
 
   return (
     <div
-      className="login-page d-flex align-items-center justify-content-center vh-100 text-light"
-      style={{ position: "relative", background:'linear-gradient(135deg, #4895ef,rgb(7, 0, 138)' }}
+      className="login-page d-flex align-items-center justify-content-center vh-100 text-light lopages"
     >
-      <div className="container shadow-lg rounded-4 overflow-hidden bg-light login-wrapper">
-        <div className="row g-0 bg-light rounded">
+      <div className="container rounded-4 overflow-hidden login-wrapper">
+        <div className="login-blur-container">
           {/* Left - Form */}
-          <div className="col-md-6 p-5 login-form-area animate__animated animate__fadeInLeft text-secondary">
+          <div className="col-md-6 p-1 login-form-area animate__animated animate__fadeInLeft text-secondary">
             <div className="text-center mb-4">
               <img
                 src="/logo.jpg"
                 alt="Company Logo"
                 className="logo-img mb-2"
               />
-              <h2 className="fw-bold">MPeoples Business Solution</h2>
+              <h2 className="fw-bold text-light fs-4">MPeoples Business Solution</h2>
             </div>
 
             {error && <div className="alert alert-danger py-2">{error}</div>}
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="employeeId" className="form-label">
+                <label htmlFor="employeeId" className="form-label text-light mb-3">
                   Employee ID
                 </label>
                 <input
@@ -130,7 +129,7 @@ const Login = () => {
               </div>
 
               <div className="mb-4 text-secondary">
-                <label htmlFor="password" className="form-label">
+                <label htmlFor="password" className="form-label text-light mb-3">
                   Password
                 </label>
                 <div className="input-group text-dark">
@@ -146,7 +145,7 @@ const Login = () => {
                   />
                   <button
                     type="button"
-                    className="btn btn-outline-secondary"
+                    className="btn btn-outline-light"
                     onClick={togglePasswordVisibility}
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
@@ -159,9 +158,8 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="btn  w-100 btn-lg fw-bold"
+                className="btn w-50 btn-lg fw-bold bg-light mt-3"
                 disabled={isLoading}
-                style={{background:'linear-gradient(135deg, #4895ef,rgb(7, 0, 138)', color:'white'}}
               >
                 {isLoading ? "Logging in..." : "Login"}
               </button>

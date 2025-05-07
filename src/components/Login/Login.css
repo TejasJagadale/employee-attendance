@@ -1,3 +1,34 @@
+.lopages{
+  background-image: url("/public/bgm.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.login-blur-container{
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+}
+
+
+.login-box {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 400px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+
 /* Base Styles */
 .login-container {
   display: flex;
@@ -61,26 +92,11 @@
 
 .custom-input {
   background-color: rgba(255, 255, 255, 0.1) !important;
-  color: black !important; /* Change this from white to black */
+  color: white !important; /* Change this from white to black */
 }
 
 .custom-input::placeholder {
   color: rgba(0, 0, 0, 0.5); /* Optional: darken placeholder too */
-}
-
-
-
-.login-box {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  width: 100%;
-  max-width: 400px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
 }
 
 /* Hover Effects */

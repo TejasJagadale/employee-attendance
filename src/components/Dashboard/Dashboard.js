@@ -38,6 +38,47 @@ const Dashboard = () => {
     new Date().toISOString().slice(0, 7) // Default to current month (YYYY-MM)
   );
 
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const authData = localStorage.getItem("authData");
+  //       const parsedData = JSON.parse(authData);
+  //       const userid = parsedData.data.user_id;
+  //       const today = new Date().toISOString().split("T")[0];
+  //       const queryParams = new URLSearchParams({
+  //         date: today,
+  //         user_id: userid
+  //       }).toString();
+
+  //       const response = await fetch(
+  //         `https://dontsign.mpeoplesnet.com/api/attendance-report-for-user-day?${queryParams}`
+  //       );
+
+  //       const result = await response.json();
+  //       console.log(result);
+
+  //       if (result.success && result.data.userinfo.length > 0) {
+  //         const user = result.data.userinfo[0];
+  //         const combinedData = user.attendances.map((attendance) => ({
+  //           name: user.name,
+  //           empid: user.empid,
+  //           mobile: user.mobile,
+  //           date: attendance.attendance_date,
+  //           checkIn: attendance.check_in,
+  //           checkOut: attendance.check_out,
+  //           workedHours: attendance.worked_hours
+  //         }));
+
+  //         setMonthlyReportData(combinedData);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -45,6 +86,13 @@ const Dashboard = () => {
         const parsedData = JSON.parse(authData);
         const userid = parsedData.data.user_id;
         const today = new Date().toISOString().split("T")[0];
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1; // Months are 0-indexed (0-11)
+        const currentMonthStr = `${currentYear}-${String(currentMonth).padStart(
+          2,
+          "0"
+        )}`;
         const queryParams = new URLSearchParams({
           date: today,
           user_id: userid
@@ -59,7 +107,23 @@ const Dashboard = () => {
 
         if (result.success && result.data.userinfo.length > 0) {
           const user = result.data.userinfo[0];
-          const combinedData = user.attendances.map((attendance) => ({
+
+          // Filter attendances to only include current month's data
+          const currentMonthAttendances = user.attendances.filter(
+            (attendance) => {
+              // Extract "YYYY-MM" from the attendance date (assuming format is "YYYY-MM-DD")
+              const attendanceMonth = attendance.attendance_date.substring(
+                0,
+                7
+              );
+              return attendanceMonth === currentMonthStr;
+            }
+          );
+
+          console.log(currentMonthAttendances);
+
+          // Map the filtered data
+          const combinedData = currentMonthAttendances.map((attendance) => ({
             name: user.name,
             empid: user.empid,
             mobile: user.mobile,
@@ -84,47 +148,98 @@ const Dashboard = () => {
       const authData = localStorage.getItem("authData");
       const parsedData = JSON.parse(authData);
       const userid = parsedData.data.user_id;
+
+      // Get current date and calculate first and last day of month
+      const now = new Date();
+      // const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      // const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+      // // Format dates as YYYY-MM-DD
+      // const formatDate = (date) => date.toISOString().split('T')[0];
       const today = new Date().toISOString().split("T")[0];
+
       const queryParams = new URLSearchParams({
         date: today,
         user_id: userid
       }).toString();
-      // 1. Fetch attendance data for the selected month from your API
+
+      // Fetch attendance data for the current month
       const response = await fetch(
         `https://dontsign.mpeoplesnet.com/api/attendance-report-for-user-day?${queryParams}`
       );
       const result = await response.json();
       console.log(result);
 
-      if (result.success && result.data.userinfo.length > 0) {
-        const user = result.data.userinfo[0];
-        const combinedData = user.attendances.map((attendance) => ({
-          name: user.name,
-          empid: user.empid,
-          mobile: user.mobile,
-          date: attendance.attendance_date,
-          checkIn: attendance.check_in,
-          checkOut: attendance.check_out,
-          workedHours: attendance.worked_hours
-        }));
-
-        setMonthlyReportData(combinedData);
-      }
-
       if (!result.success || !result.data.userinfo) {
         throw new Error(result.message || "Failed to fetch data");
       }
 
-      // Flatten the data for CSV
-      const flatData = flattenAttendanceData(result.data.userinfo);
+      // Filter data to ensure we only have current month records (in case API doesn't filter properly)
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      const filteredUserInfo = result.data.userinfo.map((user) => {
+        const filteredAttendances = user.attendances.filter((attendance) => {
+          const attendanceDate = new Date(attendance.attendance_date);
+          return (
+            attendanceDate.getMonth() === currentMonth &&
+            attendanceDate.getFullYear() === currentYear
+          );
+        });
+        return {
+          ...user,
+          attendances: filteredAttendances
+        };
+      });
+
+      // Check if we have any data after filtering
+      if (
+        filteredUserInfo.length === 0 ||
+        filteredUserInfo[0].attendances.length === 0
+      ) {
+        throw new Error("No attendance records found for the current month");
+      }
+
+      // Process the filtered data
+      const user = filteredUserInfo[0];
+      const combinedData = user.attendances.map((attendance) => ({
+        name: user.name,
+        empid: user.empid,
+        mobile: user.mobile,
+        date: attendance.attendance_date,
+        checkIn: attendance.check_in,
+        checkOut: attendance.check_out,
+        workedHours: attendance.worked_hours
+      }));
+
+      setMonthlyReportData(combinedData);
+
+      // Flatten the filtered data for CSV
+      const flatData = flattenAttendanceData(filteredUserInfo);
       const csvContent = convertToCSV(flatData);
+
+      // Get current month name for the filename
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ];
+      const currentMonthName = monthNames[currentMonth];
 
       // Download the file
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      saveAs(blob, `attendance_report_${reportMonth}.csv`);
+      saveAs(blob, `attendance_report_${currentMonthName}_${currentYear}.csv`);
     } catch (error) {
       console.error("Error generating report:", error);
-      // Show error to user
       alert(`Error generating report: ${error.message}`);
     }
   };
@@ -206,13 +321,24 @@ const Dashboard = () => {
   };
   const TOTAL_WORK_HOURS = 9;
   const reverseGeocode = async (lat, lon) => {
-    const apiKey = "pk.a02fb33a5b85e9dbe4c4a15dab83f4ea";
-    const response = await fetch(
-      `https://us1.locationiq.com/v1/reverse.php?key=${apiKey}&lat=${lat}&lon=${lon}&format=json&accept-language=en`
-    );
-    const data = await response.json();
-    return data.display_name || "Address not found";
+    try {
+      const apiKey = "pk.a02fb33a5b85e9dbe4c4a15dab83f4ea";
+      const response = await fetch(
+        `https://us1.locationiq.com/v1/reverse.php?key=${apiKey}&lat=${lat}&lon=${lon}&format=json&accept-language=en`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.display_name || "Address not found";
+    } catch (error) {
+      console.error("Reverse geocoding for checkout failed:", error);
+      return "Location unavailable";
+    }
   };
+
   useEffect(() => {
     const authData = localStorage.getItem("authData");
     if (authData) {
@@ -239,9 +365,13 @@ const Dashboard = () => {
         const authData = localStorage.getItem("authData");
         const parsedData = JSON.parse(authData);
         const userid = parsedData.data.user_id;
-        const today = new Date().toISOString().split("T")[0];
+
+        const formattedDate = new Date(selectedDate)
+          .toISOString()
+          .split("T")[0]; // use selectedDate
+
         const queryParams = new URLSearchParams({
-          date: today,
+          date: formattedDate,
           user_id: userid
         }).toString();
 
@@ -261,7 +391,7 @@ const Dashboard = () => {
 
         const attendances = result?.data?.userinfo?.[0]?.attendances || [];
         const todayAtt = attendances.find(
-          (entry) => entry.attendance_date === today
+          (entry) => entry.attendance_date === formattedDate
         );
 
         setTodayAttendance(todayAtt);
@@ -270,18 +400,16 @@ const Dashboard = () => {
           const { check_in, check_out, lat, lon, checkout_lat, checkout_lon } =
             todayAtt;
 
-          // Convert time strings to Date objects for formatting
           const checkInDate = check_in
-            ? new Date(`${today}T${check_in}`)
+            ? new Date(`${formattedDate}T${check_in}`)
             : null;
           const checkOutDate = check_out
-            ? new Date(`${today}T${check_out}`)
+            ? new Date(`${formattedDate}T${check_out}`)
             : null;
 
           setCheckInTime(checkInDate);
           setCheckOutTime(checkOutDate);
 
-          // Get location addresses
           if (lat && lon) {
             const inLocation = await reverseGeocode(lat, lon);
             setCheckInLocation(inLocation);
@@ -304,8 +432,12 @@ const Dashboard = () => {
         console.error("Error during fetch:", error);
       }
     };
-    sendData();
-  }, []);
+
+    if (selectedDate) {
+      sendData();
+    }
+  }, [selectedDate]);
+
   useEffect(() => {
     return () => {
       if (timer) clearInterval(timer);
@@ -468,15 +600,11 @@ const Dashboard = () => {
       );
       const data = await response.json();
       console.log(data);
-      if (data.ok) {
-        setCheckInTime(now);
-        setCheckOutTime(null);
-        setIsWorking(true);
-        localStorage.setItem("checkInTime", now.toString());
-        startTimer(now);
-      } else {
-        toast.error("Error");
-      }
+      setCheckInTime(now);
+      setCheckOutTime(null);
+      setIsWorking(true);
+      localStorage.setItem("checkInTime", now.toString());
+      startTimer(now);
       console.log(data);
       toast.success("Checked-in Successfully");
     } catch (error) {
@@ -486,7 +614,8 @@ const Dashboard = () => {
     }
   };
   const updateWorkHours = (startTime) => {
-    const hoursWorked = (new Date() - startTime) / (1000 * 60 * 60);
+    const secondsWorked = (new Date() - startTime) / 1000; // in seconds
+    const hoursWorked = secondsWorked / 3600; // convert to hours
     const worked = Math.min(hoursWorked, TOTAL_WORK_HOURS);
     const remaining = Math.max(TOTAL_WORK_HOURS - worked, 0);
     setWorkingHours(worked);
@@ -515,19 +644,29 @@ const Dashboard = () => {
         navigator.geolocation.getCurrentPosition(resolve, reject);
       });
 
-      // await verifyLocation();
+      // Convert workingHours (decimal) to HH:MM:SS format
+      const totalSeconds = Math.floor(workingHours * 3600);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      const formattedWorkedHours = `${hours
+        .toString()
+        .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+
       const today = new Date().toISOString().split("T")[0];
       const checkOutTime = now.toTimeString().split(" ")[0]; // Get HH:MM:SS
       const payload = {
         user_id: employeeData.userId,
         company_id: 1,
         branch_id: 1,
-        check_out: checkOutTime, // Changed from check_in to check_out
+        check_out: checkOutTime,
         checkout_lat: position.coords.latitude.toString(),
         checkout_lon: position.coords.longitude.toString(),
         attendance_date: today,
         type: "present",
-        worked_hours: workingHours
+        worked_hours: formattedWorkedHours // Now in HH:MM:SS format
       };
       console.log(payload);
       const response = await fetch(
@@ -726,11 +865,11 @@ const Dashboard = () => {
           <div className="report-section">
             <h3>Monthly Report</h3>
             <div className="report-controls">
-              <input
-                type="month"
-                value={reportMonth}
-                onChange={(e) => setReportMonth(e.target.value)}
-              />
+              {/* <input
+                // type="month"
+                // value={reportMonth}
+                // onChange={(e) => setReportMonth(e.target.value)}
+              /> */}
               <button
                 onClick={generateMonthlyReport}
                 className="download-button"
