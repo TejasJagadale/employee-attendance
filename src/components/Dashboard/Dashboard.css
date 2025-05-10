@@ -18,21 +18,29 @@
   --transition: all 0.3s ease;
 }
 
+.hours-box.extra-hours {
+  background-color: #ffeb3b;
+  color: #000;
+  border: 1px solid #ffc107;
+}
+
+.hours-box.extra-hours .hours-label {
+  color: #000;
+}
+
 /* Navbar Styles */
 .navbarr {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  padding: 15px 30px;
-  color: white;
-  position: fixed;
+  padding: 10px 20px;
+  background-color: white; /* Or any color you prefer */
+  box-shadow: var(--shadow);
+  border-bottom: 1px solid #dee2e6;
   width: 100%;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.108);
+  position: sticky; /* Makes navbar stick to top when scrolling */
+  top: 0; /* Needed for sticky positioning */
+  z-index: 1000; /* Ensures navbar stays above other content */
 }
 
 .navbar-left {
@@ -48,131 +56,124 @@
 .sidebar-toggle {
   background: none;
   border: none;
-  color: var(--secondary);
+  color: white;
   font-size: 24px;
   cursor: pointer;
-  padding: 5px;
 }
 
-.logout-button {
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.logout-button:hover {
-  background-color: #c0392b;
+.initialet {
+  background-color: white;
+  color: #3f37c9;
+  font-weight: bolder;
+  /* padding: px; */
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
 }
 
 /* Sidebar Styles */
-.sidebar {
-  width: 250px;
-  height: 100vh;
-  position: fixed;
-  left: -250px;
-  top: 0;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  color: black;
-  transition: all 0.3s ease;
-  z-index: 2000;
-  /* padding-top: 70px; */
-  /* box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); */
-}
 
 .sidebar.open {
-  left: 0;
-}
-
-.sidebar-content {
-  padding: 20px;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  width: 250px;
 }
 
 .sidebar-header {
+  padding: 10px;
   display: flex;
-  /* flex-direction: column; */
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  gap: 10px;
+  width: 100%;
 }
 
-.sidebar-profile-image {
+.employee-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  margin-right: 15px;
   object-fit: cover;
+  margin-bottom: 10px;
 }
 
-.sidebar-user-info h3 {
-  margin: 0;
-  font-size: 16px;
+.sidebar.collapsed .employee-image {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 10px;
 }
 
-.sidebar-user-info p {
-  margin: 5px 0 0;
-  font-size: 14px;
-  opacity: 0.8;
+.sidebar-user-info {
+  text-align: center;
+}
+
+.sidebar.collapsed .sidebar-user-info {
+  display: none;
 }
 
 .sidebar-menu {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 20px 0;
+  flex-grow: 1;
 }
 
 .sidebar-menu li {
-  padding: 12px 15px;
+  padding: 12px 20px;
   cursor: pointer;
-  border-radius: 4px;
-  margin-bottom: 5px;
-  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
 }
 
 .sidebar-menu li:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-.sidebar-menu li.active {
-  background: #3498db;
+.menu-icon {
+  margin-right: 15px;
+  font-size: 20px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar.collapsed .menu-icon {
+  margin-right: 0;
+}
+
+.menu-text {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .menu-text {
+  display: none;
+}
+
+.navbar-right {
+  /* padding: 20px; */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-button-icon {
+  width: 100%;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
 }
 
 /* Main Content Styles */
 .main-content {
-  margin-top: 70px;
-  padding: 20px;
+  /* padding: 20px; */
   transition: all 0.3s ease;
+  margin-left: 70px;
 }
 
 /* .main-content.sidebar-open {
   margin-left: 250px;
 } */
 
-.navbarr {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 10px 20px;
-  /* background: linear-gradient(135deg, var(--primary), var(--secondary)); */
-  box-shadow: var(--shadow);
-  border-bottom: 1px solid #dee2e6;
-  width: 100%;
-}
-
-.navbar-left,
-.navbar-right {
+.navbar-left {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -183,32 +184,19 @@
   width: auto;
 }
 
-/* Adjust the existing logout button style if needed
-.logout-button {
-  padding: 8px 16px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.logout-button:hover {
-  background-color: #c82333;
-} */
-
 .total {
   /* width: 1200px; */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: #f5fbff;
 }
 
 .total1 {
   margin-top: 20px;
   display: flex;
-  width: 1200px;
+  /* width: 1200px; */
 }
 
 /* Employee Header Styles */
@@ -284,19 +272,27 @@
 }
 
 .logout-button {
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white;
-  width: 100%;
-  /* border: 1px solid white; */
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
   cursor: pointer;
-  font-weight: 500;
-  transition: var(--transition);
+  background: white;
+  color: #3f37c9;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  transition: all 0.3s ease; /* Smooth transition for all properties */
+  transform: scale(1); /* Default scale */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  border-radius: 10px;
 }
 
 .logout-button:hover {
-  background: linear-gradient(135deg, var(--accent), var(--secondary));
+  background-color: #4f46ff; /* Darker shade on hover */
+  color: white;
+  transform: scale(1.05); /* Slightly larger on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+.logout-button:active {
+  transform: scale(0.98); /* Slight press effect when clicked */
 }
 
 /* Report Section Styles */
@@ -306,7 +302,8 @@
   border-radius: var(--radius);
   padding: 1.5rem;
   margin: 1rem;
-  box-shadow: var(--shadow);
+  /* box-shadow: var(--shadow); */
+  border: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -418,8 +415,9 @@
 .week-view-container {
   background: white;
   border-radius: var(--radius);
-  padding: 1.5rem;
-  box-shadow: var(--shadow);
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  /* box-shadow: var(--shadow); */
 }
 
 .week-view-container h3 {
@@ -448,6 +446,10 @@
   background: var(--light-gray);
 }
 
+.day-box.past-date {
+  background-color: #b7b7b7;
+}
+
 .day-box:hover {
   background: #dee2e6;
 }
@@ -474,7 +476,8 @@
   background: white;
   border-radius: var(--radius-lg);
   padding: 2rem;
-  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  /* box-shadow: var(--shadow-lg); */
   margin-bottom: 2rem;
 }
 
@@ -657,8 +660,32 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
+.logoutbtn {
+  cursor: pointer;
+  background-color: #3f37c9;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+  transition: all 0.3s ease; /* Smooth transition for all properties */
+  transform: scale(1); /* Default scale */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.logoutbtn:hover {
+  background-color: #2a24a1; /* Darker shade on hover */
+  transform: scale(1.05); /* Slightly larger on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+.logoutbtn:active {
+  transform: scale(0.98); /* Slight press effect when clicked */
+}
+
 /* Mobile Responsive Styles */
 @media only screen and (max-width: 768px) {
+  .logoutbtn {
+    display: none;
+  }
   .navbarr {
     display: flex;
     justify-content: space-between;
@@ -669,15 +696,18 @@
     justify-content: space-between;
     align-items: center;
   }
-  .sidebar {
+
+  .sidebar.open {
     width: 100%;
-    left: -100%;
+  }
+  .sidebar.collapsed {
+    display: none;
   }
   .main-content {
     width: 100%;
-    margin-top: 50px;
     padding: 0px;
     transition: all 0.3s ease;
+    margin-left: 0;
   }
   .total1 {
     width: 100%;

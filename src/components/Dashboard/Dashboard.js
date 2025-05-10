@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
 import { toast } from "react-toastify";
 import { saveAs } from "file-saver";
+import { Skeleton } from "@mui/material";
+import Sidebar from "../Sidebar/Sidebar";
 // import * as XLSX from "xlsx";
 // const OFFICE_LOCATION = {
 //   latitude: 11.6735742,
@@ -17,10 +19,11 @@ const Dashboard = () => {
   const [checkOutTime, setCheckOutTime] = useState(null);
   const [checkInLocation, setCheckInLocation] = useState("");
   const [checkOutLocation, setCheckOutLocation] = useState("");
-  const [todayAttendance, setTodayAttendance] = useState(null);
+  // const [todayAttendance, setTodayAttendance] = useState(null);
   const [workingHours, setWorkingHours] = useState(0);
   const [remainingHours, setRemainingHours] = useState(9);
   const [isWorking, setIsWorking] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [timer, setTimer] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [employeeData, setEmployeeData] = useState({
@@ -34,9 +37,15 @@ const Dashboard = () => {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [reportMonth, setReportMonth] = useState(
-    new Date().toISOString().slice(0, 7) // Default to current month (YYYY-MM)
-  );
+
+  useEffect(() => {
+    // Simulate loading delay (e.g., fetching data)
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -394,7 +403,7 @@ const Dashboard = () => {
           (entry) => entry.attendance_date === formattedDate
         );
 
-        setTodayAttendance(todayAtt);
+        // setTodayAttendance(todayAtt);
 
         if (todayAtt) {
           const { check_in, check_out, lat, lon, checkout_lat, checkout_lon } =
@@ -593,7 +602,7 @@ const Dashboard = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}` // If using token auth
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`
           },
           body: JSON.stringify(payload)
         }
@@ -752,14 +761,14 @@ const Dashboard = () => {
     })}`;
   };
   return (
-    <div className="total">
+    <>
       {/* Navbar */}
-      <div className="navbarr">
-        <div className="navbar-left">
+      {/* <div className="navbarr">
+        <div className="navbar-leftadmin">
           <img
             src="/logomp.png"
             alt="Company Logo"
-            className="company-logo"
+            className="company-logoadmin"
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = "";
@@ -769,256 +778,362 @@ const Dashboard = () => {
         <div>
           {!sidebarOpen ? (
             <button
-              className="sidebar-toggle"
+              className="sidebar-toggleadmin"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               ☰
             </button>
           ) : (
             <button
-              className="sidebar-toggle"
+              className="sidebar-toggleadmin"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               ✕
             </button>
           )}
         </div>
-      </div>
-
-      {/* Sidebar */}
-      <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-content">
-          <div className="duplicate">
-            <div className="sidebar-header">
-              <div>
-                <img
-                  src={employeeData.profileimg}
-                  alt="Profile"
-                  className="employee-image"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "";
-                  }}
-                />
-                <div className="sidebar-user-info">
-                  <h3>{employeeData.name}</h3>
-                  <p>{employeeData.role}</p>
-                </div>
-              </div>
-              <div>
+        <div className="logoutbtn" onClick={handleLogout} style={{ color: "black" }}>
+          <PowerSettingsNewIcon />
+        </div>
+      </div> */}
+      <Sidebar/>
+      <div className="total">
+        {/* Sidebar */}
+        {/* <div className={`sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
+          <div className="sidebar-content">
+            <div className="duplicate">
+              <div className="sidebar-header">
+                {sidebarOpen ? (
+                  <>
+                    <div>
+                      <img
+                        src={employeeData.profileimg}
+                        alt="Profile"
+                        className="employee-image"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "";
+                        }}
+                      />
+                      <div className="sidebar-user-info">
+                        <h3>{employeeData.name}</h3>
+                        <p>{employeeData.role}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <button
+                        className="sidebar-toggle"
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </>
+                ) : (
                 <button
-                  className="sidebar-toggle"
+                  className="sidebar-toggle initialet"
                   onClick={() => setSidebarOpen(!sidebarOpen)}
                 >
-                  ✕
+                  {employeeData.name.charAt(0).toUpperCase()}
                 </button>
+                )}
               </div>
+              <ul className="sidebar-menu">
+                <li className="active">
+                  <span className="menu-icon">
+                    <SpaceDashboardIcon />
+                  </span>
+                  {sidebarOpen && <span className="menu-text">Dashboard</span>}
+                </li>
+                <li>
+                  <span className="menu-icon">
+                    <PeopleIcon />
+                  </span>
+                  {sidebarOpen && <span className="menu-text">Attendance</span>}
+                </li>
+                <li>
+                  <span className="menu-icon">
+                    <AssessmentIcon />
+                  </span>
+                  {sidebarOpen && <span className="menu-text">Reports</span>}
+                </li>
+                <li>
+                  <span className="menu-icon">
+                    <AccountBoxIcon />
+                  </span>
+                  {sidebarOpen && <span className="menu-text">Profile</span>}
+                </li>
+                <li>
+                  <span className="menu-icon">
+                    <SettingsIcon />
+                  </span>
+                  {sidebarOpen && <span className="menu-text">Settings</span>}
+                </li>
+              </ul>
             </div>
-            <ul className="sidebar-menu">
-              <li className="active">Dashboard</li>
-              <li>Attendance</li>
-              <li>Reports</li>
-              <li>Profile</li>
-              <li>Settings</li>
-            </ul>
+            <div className="navbar-right">
+              {sidebarOpen ? (
+                <button onClick={handleLogout} className="logout-button">
+                  Logout
+                </button>
+              ) : (
+                <button onClick={handleLogout} className="logout-button-icon">
+                  <LogoutIcon />
+                </button>
+              )}
+            </div>
           </div>
-          <div className="navbar-right">
-            <button onClick={handleLogout} className="logout-button">
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
+        </div> */}
+        {/* <Sidebar/> */}
 
-      {/* Main Content */}
-      <div className={`main-content ${sidebarOpen ? "sidebar-open" : ""}`}>
-        <div className="total1">
-          <div className="employee-header">
-            <div className="employee-profile">
-              <img
-                src={employeeData.profileimg}
-                alt="Profile"
-                className="employee-image"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "";
-                }}
-              />
-              <div className="employee-info">
-                <h1>{employeeData.name}</h1>
-                <p className="employee-role">{employeeData.role}</p>
-              </div>
-            </div>
-            <div className="date-picker-container">
-              <div>
-                <label htmlFor="attendance-date">Select Date: </label>
-                <input
-                  type="date"
-                  id="attendance-date"
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                  max={new Date().toISOString().split("T")[0]}
-                />
-              </div>
-            </div>
+        {loading ? (
+          <div style={{ width: "1200px", marginTop: "100px" }}>
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={80}
+            />
+            <Skeleton animation="wave" variant="text" width={200} height={40} />
+            <Skeleton
+              animation="wave"
+              variant="circular"
+              width={40}
+              height={40}
+            />
+            <Skeleton animation="wave" variant="text" width="50%" height={40} />
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={200}
+            />
+            <Skeleton animation="wave" variant="text" width="50%" height={40} />
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={200}
+            />
+            <Skeleton animation="wave" variant="text" width="50%" height={40} />
+            <Skeleton animation="wave" variant="text" width="50%" height={40} />
+            <Skeleton
+              animation="wave"
+              variant="rectangular"
+              width="100%"
+              height={200}
+            />
           </div>
-          <div className="report-section">
-            <h3>Monthly Report</h3>
-            <div className="report-controls">
-              {/* <input
+        ) : (
+          <>
+            {/* Main Content */}
+            <div
+              className={`main-content ${sidebarOpen ? "sidebar-open" : ""}`}
+            >
+              <div className="total1">
+                <div className="employee-header">
+                  <div className="employee-profile">
+                    <img
+                      src={employeeData.profileimg}
+                      alt="Profile"
+                      className="employee-image"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "";
+                      }}
+                    />
+                    <div className="employee-info">
+                      <h1>{employeeData.name}</h1>
+                      <p className="employee-role">{employeeData.role}</p>
+                    </div>
+                  </div>
+                  <div className="date-picker-container">
+                    <div>
+                      <label htmlFor="attendance-date">Select Date: </label>
+                      <input
+                        type="date"
+                        id="attendance-date"
+                        value={selectedDate}
+                        onChange={handleDateChange}
+                        max={new Date().toISOString().split("T")[0]}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="report-section">
+                  <h3>Monthly Report</h3>
+                  <div className="report-controls">
+                    {/* <input
                 // type="month"
                 // value={reportMonth}
                 // onChange={(e) => setReportMonth(e.target.value)}
               /> */}
-              <button
-                onClick={generateMonthlyReport}
-                className="download-button"
-              >
-                Download Monthly Report
-              </button>
-              {!showTable ? (
-                <button
-                  onClick={() => setShowTable(true)}
-                  className="show-data-button"
-                >
-                  Show Data
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowTable(false)}
-                  className="hide-data-button"
-                >
-                  Hide Data
-                </button>
+                    <button
+                      onClick={generateMonthlyReport}
+                      className="download-button"
+                    >
+                      Download Monthly Report
+                    </button>
+                    {!showTable ? (
+                      <button
+                        onClick={() => setShowTable(true)}
+                        className="show-data-button"
+                      >
+                        Show Data
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setShowTable(false)}
+                        className="hide-data-button"
+                      >
+                        Hide Data
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+              {showTable && monthlyReportData.length > 0 && (
+                <div className="monthly-report-table">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Emp ID</th>
+                        <th>Mobile</th>
+                        <th>Date</th>
+                        <th>Check-In</th>
+                        <th>Check-Out</th>
+                        <th>Hours Worked</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {monthlyReportData.map((row, index) => (
+                        <tr key={index}>
+                          <td>{row.name}</td>
+                          <td>{row.empid}</td>
+                          <td>{row.mobile}</td>
+                          <td>{row.date}</td>
+                          <td>{row.checkIn || "—"}</td>
+                          <td>{row.checkOut || "—"}</td>
+                          <td>{row.workedHours || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
-            </div>
-          </div>
-        </div>
-        {showTable && monthlyReportData.length > 0 && (
-          <div className="monthly-report-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Emp ID</th>
-                  <th>Mobile</th>
-                  <th>Date</th>
-                  <th>Check-In</th>
-                  <th>Check-Out</th>
-                  <th>Hours Worked</th>
-                </tr>
-              </thead>
-              <tbody>
-                {monthlyReportData.map((row, index) => (
-                  <tr key={index}>
-                    <td>{row.name}</td>
-                    <td>{row.empid}</td>
-                    <td>{row.mobile}</td>
-                    <td>{row.date}</td>
-                    <td>{row.checkIn || "—"}</td>
-                    <td>{row.checkOut || "—"}</td>
-                    <td>{row.workedHours || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
-        <div className="dashboard-container">
-          <div className="week-view-container">
-            <h3>Week of {getWeekRange(selectedDate)}</h3>
-            <div className="week-days">
-              {getWeekDates(selectedDate).map((date, index) => (
-                <div
-                  key={index}
-                  className={`day-box ${
-                    isSameDay(date, selectedDate) ? "active" : ""
-                  }`}
-                  onClick={() =>
-                    handleDateChange({
-                      target: { value: formatDateForInput(date) }
-                    })
-                  }
-                >
-                  <div className="day-name">{formatDayName(date)}</div>
-                  <div className="day-date">{date.getDate()}</div>
+              <div className="dashboard-container">
+                <div className="week-view-container">
+                  <h3>Week of {getWeekRange(selectedDate)}</h3>
+                  <div className="week-days">
+                    {getWeekDates(selectedDate).map((date, index) => {
+                      const isActive = isSameDay(date, selectedDate);
+                      const isPast =
+                        date < new Date() && !isSameDay(date, new Date());
+                      return (
+                        <div
+                          key={index}
+                          className={`day-box ${isActive ? "active" : ""} ${
+                            isPast ? "past-date" : ""
+                          }`}
+                          onClick={() =>
+                            handleDateChange({
+                              target: { value: formatDateForInput(date) }
+                            })
+                          }
+                        >
+                          <div className="day-name">{formatDayName(date)}</div>
+                          <div className="day-date">{date.getDate()}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="attendance-card">
-            <h2>
-              Attendance Tracking for{" "}
-              {new Date(selectedDate).toLocaleDateString()}
-            </h2>
-            {locationError && (
-              <div className="error-message">{locationError}</div>
-            )}
-            <div className="time-display">
-              <div className="time-display1">
-                <span className="time-label">Check-In:</span>
-                <span className="time-value">{formatTime(checkInTime)}</span>
-                <div className="location-info">
-                  {checkInLocation && (
-                    <div className="time-display2">
-                      <p className="locp">Location: {checkInLocation}</p>
-                    </div>
+                <div className="attendance-card">
+                  <h2>
+                    Attendance Tracking for{" "}
+                    {new Date(selectedDate).toLocaleDateString()}
+                  </h2>
+                  {locationError && (
+                    <div className="error-message">{locationError}</div>
                   )}
-                </div>
-              </div>
-              <div className="time-display1">
-                <span className="time-label">Check-Out:</span>
-                <span className="time-value">{formatTime(checkOutTime)}</span>
-                <div className="location-info">
-                  {checkOutLocation && (
-                    <div className="time-display2">
-                      <p className="locp">Location: {checkOutLocation}</p>
+                  <div className="time-display">
+                    <div className="time-display1">
+                      <span className="time-label">Check-In:</span>
+                      <span className="time-value">
+                        {formatTime(checkInTime)}
+                      </span>
+                      <div className="location-info">
+                        {checkInLocation && (
+                          <div className="time-display2">
+                            <p className="locp">Location: {checkInLocation}</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                    <div className="time-display1">
+                      <span className="time-label">Check-Out:</span>
+                      <span className="time-value">
+                        {formatTime(checkOutTime)}
+                      </span>
+                      <div className="location-info">
+                        {checkOutLocation && (
+                          <div className="time-display2">
+                            <p className="locp">Location: {checkOutLocation}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="hours-display">
+                    <div className="hours-box spent-hours">
+                      <span className="hours-label">Hours Worked</span>
+                      <span className="hours-value">
+                        {formatHours(workingHours)}
+                      </span>
+                    </div>
+                    <div className="hours-box remaining-hours">
+                      <span className="hours-label">Remaining</span>
+                      <span className="hours-value">
+                        {formatHours(remainingHours)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="progress-container">
+                    <div
+                      className="progress-bar"
+                      style={{ width: `${progressPercentage}%` }}
+                    ></div>
+                    <span className="progress-text">
+                      {progressPercentage.toFixed(0)}% of workday completed
+                    </span>
+                  </div>
+                  <div className="action-buttons">
+                    {!isWorking ? (
+                      <button
+                        onClick={handleCheckIn}
+                        className="checkin-button"
+                        disabled={isCheckingIn}
+                      >
+                        {isCheckingIn ? "Verifying Location..." : "Check In"}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleCheckOut}
+                        className="checkout-button"
+                      >
+                        Check Out
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="hours-display">
-              <div className="hours-box spent-hours">
-                <span className="hours-label">Hours Worked</span>
-                <span className="hours-value">{formatHours(workingHours)}</span>
-              </div>
-              <div className="hours-box remaining-hours">
-                <span className="hours-label">Remaining</span>
-                <span className="hours-value">
-                  {formatHours(remainingHours)}
-                </span>
-              </div>
-            </div>
-            <div className="progress-container">
-              <div
-                className="progress-bar"
-                style={{ width: `${progressPercentage}%` }}
-              ></div>
-              <span className="progress-text">
-                {progressPercentage.toFixed(0)}% of workday completed
-              </span>
-            </div>
-            <div className="action-buttons">
-              {!isWorking ? (
-                <button
-                  onClick={handleCheckIn}
-                  className="checkin-button"
-                  disabled={isCheckingIn}
-                >
-                  {isCheckingIn ? "Verifying Location..." : "Check In"}
-                </button>
-              ) : (
-                <button onClick={handleCheckOut} className="checkout-button">
-                  Check Out
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
-    </div>
+    </>
   );
 };
 

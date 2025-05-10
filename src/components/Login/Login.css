@@ -1,19 +1,19 @@
-.lopages{
-  background-image: url("/public/bgm.jpg");
+.lopages {
+  /* background-image: url("/public/bgm.jpg"); */
+  background-color: antiquewhite;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
 
-.login-blur-container{
-  background-color: rgba(255, 255, 255, 0.2);
+.login-blur-container {
+  background-color: #f5f5f5;
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
   padding: 20px;
   border-radius: 20px;
   display: flex;
 }
-
 
 .login-box {
   background-color: rgba(255, 255, 255, 0.2);
@@ -27,7 +27,6 @@
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
 }
-
 
 /* Base Styles */
 .login-container {
@@ -61,14 +60,14 @@
 }
 
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 5px #0dcaf0;
   }
   50% {
     box-shadow: 0 0 20px #0dcaf0;
   }
 }
-
 
 .login-bg {
   background: linear-gradient(to right, #004e92, #000428);
@@ -92,7 +91,7 @@
 
 .custom-input {
   background-color: rgba(255, 255, 255, 0.1) !important;
-  color: white !important; /* Change this from white to black */
+  color: black !important; /* Change this from white to black */
 }
 
 .custom-input::placeholder {
@@ -107,11 +106,9 @@
   border-color: rgba(255, 255, 255, 0.5);
 }
 
-
-
 .login-box h2 {
   text-align: center;
-  color: white;
+  color: black;
   margin-bottom: 25px;
   font-size: 24px;
 }

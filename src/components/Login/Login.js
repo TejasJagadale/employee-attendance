@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Lottie from "lottie-react";
-import loaderAnimation from "../../animations/loader.json";
+import loaderAnimation from "../../animations/plane.json";
 import { toast } from "react-toastify";
+import LoginIcon from '@mui/icons-material/Login';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -73,13 +74,17 @@ const Login = () => {
       const data = await response.json();
       console.log(data);
 
+      if (data.data.role[0] === "Admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+
       // Store the response data in localStorage
       localStorage.setItem("authData", JSON.stringify(data));
       localStorage.setItem("isAuthenticated", "true");
       toast.success("Login successful!");
-
       // Navigate to dashboard
-      navigate("/dashboard");
     } catch (err) {
       // setError(err.message || 'Invalid credentials. Please try again.');
       toast.error("Invalid credentials. Please try again.");
@@ -93,9 +98,7 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="login-page d-flex align-items-center justify-content-center vh-100 text-light lopages"
-    >
+    <div className="login-page d-flex align-items-center justify-content-center vh-100 text-dark lopages">
       <div className="container rounded-4 overflow-hidden login-wrapper">
         <div className="login-blur-container">
           {/* Left - Form */}
@@ -106,14 +109,19 @@ const Login = () => {
                 alt="Company Logo"
                 className="logo-img mb-2"
               />
-              <h2 className="fw-bold text-light fs-4">MPeoples Business Solution</h2>
+              <h2 className="fw-bold text-dark fs-4">
+                MPeoples Business Solution
+              </h2>
             </div>
 
             {error && <div className="alert alert-danger py-2">{error}</div>}
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="employeeId" className="form-label text-light mb-3">
+                <label
+                  htmlFor="employeeId"
+                  className="form-label text-dark mb-3 fw-bold"
+                >
                   Employee ID
                 </label>
                 <input
@@ -129,7 +137,10 @@ const Login = () => {
               </div>
 
               <div className="mb-4 text-secondary">
-                <label htmlFor="password" className="form-label text-light mb-3">
+                <label
+                  htmlFor="password"
+                  className="form-label text-dark mb-3 fw-bold"
+                >
                   Password
                 </label>
                 <div className="input-group text-dark">
@@ -145,7 +156,7 @@ const Login = () => {
                   />
                   <button
                     type="button"
-                    className="btn btn-outline-light"
+                    className="btn btn-outline-secondary"
                     onClick={togglePasswordVisibility}
                     aria-label={
                       showPassword ? "Hide password" : "Show password"
@@ -158,10 +169,11 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="btn w-50 btn-lg fw-bold bg-light mt-3"
+                className="btn w-40 btn-lg fw-bold mt-3"
                 disabled={isLoading}
+                style={{ backgroundColor: "#3f37c9", color: "white" }}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? "Logging in..." : "Login"}&nbsp;<LoginIcon />
               </button>
             </form>
           </div>
@@ -175,7 +187,7 @@ const Login = () => {
                 animationData={loaderAnimation}
                 loop
                 autoplay
-                style={{ width: 150, height: 150 }}
+                style={{ width: 400, height: 400 }}
               />
             </div>
           )}

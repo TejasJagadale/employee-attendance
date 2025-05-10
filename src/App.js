@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Login from './components/Login/Login.js';
 import Dashboard from './components/Dashboard/Dashboard.js';
 import './App.css';
+import Admin from './components/Admin/Admin.js';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<Admin/>}/>
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
       </div>
